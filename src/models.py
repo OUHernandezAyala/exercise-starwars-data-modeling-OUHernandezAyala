@@ -1,32 +1,55 @@
-import os
-import sys
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship, declarative_base
-from sqlalchemy import create_engine
 from eralchemy2 import render_er
 
 Base = declarative_base()
 
-class Person(Base):
-    __tablename__ = 'person'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
+class User(Base):
+    __tablename__ = 'user'
+    id_user = Column(Integer, primary_key=True)
+    password = Column(String(10), nullable=False)
     name = Column(String(250), nullable=False)
+    favorites = relationship("Favorites", uselist=False, back_populates="user")
 
-class Address(Base):
-    __tablename__ = 'address'
-    # Here we define columns for the table address.
-    # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
-    street_name = Column(String(250))
-    street_number = Column(String(250))
-    post_code = Column(String(250), nullable=False)
-    person_id = Column(Integer, ForeignKey('person.id'))
-    person = relationship(Person)
+class Favorites(Base):
+    __tablename__ = 'favorites'
+    id_favorites = Column(Integer, primary_key=True)
+    id_user = Column(Integer, ForeignKey("user.id_user"), unique=True)
+    id_planets = Column(Integer, ForeignKey("planets.id_planet"))
+    id_characters = Column(Integer, ForeignKey("characters.id_charactes"))
+    name_characters = Column(String(250), ForeignKey("charactes.name_characters"))
+    name_planets  = Column(String(250), ForeignKey("planets.name_planets")) 
+    user = relationship("User", uselist=False, back_populates="favorites")
+    planets = relationship("Planets", back_populates="favorites")
+    characters = relationship("Characters", back_populates="favorites")
 
-    def to_dict(self):
-        return {}
+class Characters(Base):
+    __tablename__ = 'characters'
+    id_characters = Column(Integer, primary_key=True)
+    name_characters = Column(String(250), primary_key=True)
+    type = Column(String(250), nullable=False)
+    description = Column(String(400), nullable=False)
+    species = Column(String(250), nullable=False)
+    url_characters = Column(String(250), nullable=False)
+    planet_name_origin = Column(String(20), ForeignKey("planets.name_planets"))
+    planets = relationship("Planets", uselist=False, back_populates="characters")
+    favorites = relationship("Favorites", back_populates="characters")
 
-## Draw from SQLAlchemy base
+class Planets(Base):
+    __tablename__ = 'planets'
+    id_planets = Column(Integer, primary_key=True)
+    name_planets = Column(String(250), primary_key=True)
+    type = Column(String(250), nullable=False)
+    description = Column(String(400), nullable=False)
+    population = Column(String(250), nullable=False)
+    diameter = Column(String(250), nullable=False)
+    terrain = Column(String(250), nullable=False)
+    residents = Column(String(20), ForeignKey("characters.name_characters"))
+    characters = relationship("Characters", back_populates="planets")
+    favorites = relationship("Favorites", back_populates="planets")
+
+def to_dict(self):
+    return {}
+
+# Draw from SQLAlchemy base
 render_er(Base, 'diagram.png')
