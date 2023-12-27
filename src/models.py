@@ -23,15 +23,15 @@ class Favorites(Base):
     planets = relationship("Planets")
     id_characters = Column(Integer, ForeignKey("characters.id"))
     characters = relationship("Characters")
-    name_planet = Column(String, ForeignKey("planets.name"))
-    name_characters = Column(String, ForeignKey("characters.name"))
+    name_planet = Column(String)
+    name_characters = Column(String)
 
 
 class Planets(Base):
     __tablename__ = 'planets'
     id = Column(Integer, primary_key=True, nullable=False)
     favorites= relationship("Favorites")
-    name = Column(String, primary_key=True, nullable=False)
+    name = Column(String, nullable=False)
     type = Column(String(250))
     description = Column(String(400))
     population = Column(String(250))
@@ -44,7 +44,7 @@ class Characters(Base):
     __tablename__ = 'characters'
     id =  Column(Integer, primary_key=True)
     favorites= relationship("Favorites")
-    name = Column(String, primary_key=True, nullable=False)
+    name = Column(String, nullable=False)
     type = Column(String(250))
     description = Column(String(400))
     species = Column(String(250))
